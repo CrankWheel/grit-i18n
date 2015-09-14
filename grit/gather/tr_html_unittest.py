@@ -277,7 +277,7 @@ class TrHtmlUnittest(unittest.TestCase):
     html = tr_html.TrHtml(StringIO.StringIO(text))
     html.Parse()
     self.failUnlessEqual(html.skeleton_[1].GetMessage().GetPresentableContent(),
-                         'Test  Message')
+                         'Test     Message')
 
     html = tr_html.TrHtml(StringIO.StringIO(text))
     html.fold_whitespace_ = True

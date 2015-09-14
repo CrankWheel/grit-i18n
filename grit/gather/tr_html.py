@@ -102,7 +102,7 @@ _WHITESPACE = lazy_re.compile(r'(\s|&nbsp;|\\n|\\r|<!--\s*desc\s*=.*?-->)+',
 # Matches whitespace sequences which can be folded into a single whitespace
 # character.  This matches single characters so that non-spaces are replaced
 # with spaces.
-_FOLD_WHITESPACE = lazy_re.compile(r'\s+')
+_FOLD_WHITESPACE = lazy_re.compile(r'\s+', re.MULTILINE)
 
 # Finds a non-whitespace character
 _NON_WHITESPACE = lazy_re.compile(r'\S')
@@ -273,10 +273,6 @@ class HtmlChunks(object):
       else:
         text = text.replace('\n', ' ')
         text = text.replace('\r', ' ')
-        # This whitespace folding doesn't work in all cases, thus the
-        # fold_whitespace flag to support backwards compatibility.
-        text = text.replace('   ', ' ')
-        text = text.replace('  ', ' ')
 
     if translateable:
       description = self.last_description
