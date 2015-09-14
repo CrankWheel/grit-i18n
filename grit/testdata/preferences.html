@@ -72,7 +72,7 @@ value="[PREVPAGE]" type=hidden>
 name=submit2></td>
 </tr></table>
 
-[STATUS-MESSAGE]
+{{status-message}}
 <table class="plain-subheader"><tr>
 <td class="header-element expand"><span class="b">Preferences</span><span
 class="s"> (changes apply to Google Desktop Search application)</span></td>
@@ -91,12 +91,12 @@ search for them:<br />&nbsp;</div>
   <td width=150 nowrap valign=top><span class="s">
   <input type=checkbox [CHECK-EMAIL] name=EMAIL id=h3><label for=h3>
   Email</label><br>
-  <input type=checkbox [CHECK-AIM] name=AIM id=h5><label for=h5> Chats 
+  <input type=checkbox [CHECK-AIM] name=AIM id=h5><label for=h5> Chats
   (AOL/MSN IM)</label><br>
   <input type=checkbox onclick='if(!this.checked){h12.checked=0;h12.disabled=1;}
    else {h12.disabled=0;}' [CHECK-WEB] name=WEB id=h11><label for=h11> Web
    history</label>
-  
+
   </span></td>
   <td width=120 nowrap valign=top><span class="s">
   <script>
@@ -134,8 +134,8 @@ if (!(w.checked || e.checked)) { o.checked=0;o.disabled=1;} else {o.disabled=0;}
 <td class="phead">Plug-ins</td>
 <td class="pbody"><div class="s"
 style="display:[ADDIN-DISPLAYSTYLE]">Index these additional items:<p>
-[ADDIN-DO]
-[ADDIN-OPTIONS]</div><div class="s">
+{{ADDIN-DO}}
+{{ADDIN-OPTIONS}}</div><div class="s">
 To install plug-ins to index other items, visit the
 <a href="http://desktop.google.com/plugins.html">Plug-ins Download page</a>.</div>
 </tr>

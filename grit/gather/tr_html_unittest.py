@@ -184,7 +184,7 @@ class ParserUnittest(unittest.TestCase):
 
   def testTranslateableHtmlToMessage(self):
     msg = tr_html.HtmlToMessage(
-      'Hello <b>[USERNAME]</b>, &lt;how&gt;&nbsp;<i>are</i> you?')
+      'Hello <b>{{USERNAME}}</b>, &lt;how&gt;&nbsp;<i>are</i> you?')
     pres = msg.GetPresentableContent()
     self.failUnless(pres ==
                     'Hello BEGIN_BOLDX_USERNAME_XEND_BOLD, '
@@ -209,7 +209,7 @@ class ParserUnittest(unittest.TestCase):
                     'New FeaturesEND_LINK: Now search PDFs, MP3s, Firefox '
                     'web history, and moreEND_FONT_1')
 
-    msg = tr_html.HtmlToMessage('''<a href='[$~URL~$]'><b>[NUM][CAT]</b></a>''')
+    msg = tr_html.HtmlToMessage('''<a href='[$~URL~$]'><b>{{NUM}}{{CAT}}</b></a>''')
     pres = msg.GetPresentableContent()
     self.failUnless(pres == 'BEGIN_LINKBEGIN_BOLDX_NUM_XX_CAT_XEND_BOLDEND_LINK')
 
@@ -395,8 +395,8 @@ bla
 
     for item in [x for x in html.skeleton_
                  if isinstance(x, clique.MessageClique)]:
-      if (item.GetMessage().GetRealContent() == '[STATUS-MESSAGE]' or
-          item.GetMessage().GetRealContent() == '[ADDIN-DO] [ADDIN-OPTIONS]'):
+      if (item.GetMessage().GetRealContent() == '{{status-message}}' or
+          item.GetMessage().GetRealContent() == '{{ADDIN-DO}} {{ADDIN-OPTIONS}}'):
         self.fail()
 
     self.failUnless(len(html.skeleton_) > 100)

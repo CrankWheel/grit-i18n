@@ -30,7 +30,7 @@ languages floating around Google, is to create a parser with a simple state
 machine that keeps track of what kind of tag it's inside, and whether it's in
 a translateable section or not.  Translateable sections are:
 
-a) text (including [BINGO] replaceables) inside of tags that
+a) text (including {{BINGO}} replaceables) inside of tags that
    can contain translateable text (which is all tags except
    for a few)
 
@@ -128,6 +128,8 @@ _NONTRANSLATEABLES = lazy_re.compile(r'''
   <\s*/\s*[a-zA-Z_]+:.+?>   # custom tag (close)
   |
   <!\s*[A-Z]+\s*([^>]+|"[^"]+"|'[^']+')*?>
+  |
+  {{[#/^!>].*?}}
   ''', re.MULTILINE | re.DOTALL | re.VERBOSE | re.IGNORECASE)
 
 # Matches a tag and its attributes
@@ -180,10 +182,9 @@ _CHARACTERS = lazy_re.compile(r'''
   )+
   ''', re.MULTILINE | re.DOTALL | re.VERBOSE)
 
-# Matches Total Recall's "replaceable" tags, which are just any text
-# in capitals enclosed by delimiters like [] or [~~] or [$~~$] (e.g. [HELLO],
-# [~HELLO~] and [$~HELLO~$]).
-_REPLACEABLE = lazy_re.compile(r'\[(\$?\~)?(?P<name>[A-Z0-9-_]+?)(\~\$?)?\]',
+# Matches Mustache "replaceable" tags, which are just any atom-like literal
+# enclosed by {{ }} such as {{name}}.
+_REPLACEABLE = lazy_re.compile(r'{{(?P<name>[A-Za-z0-9-_]+?)}}',
                                re.MULTILINE)
 
 
@@ -742,4 +743,3 @@ class TrHtml(interface.GathererBase):
           continue
       new_skel.append(chunk)
     self.skeleton_ = new_skel
-

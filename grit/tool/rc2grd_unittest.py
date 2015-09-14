@@ -29,7 +29,7 @@ class Rc2GrdUnittest(unittest.TestCase):
 
   def testHtmlPlaceholderize(self):
     tool = rc2grd.Rc2Grd()
-    original = "Hello <b>[USERNAME]</b>, how are you? I'm [AGE] years old!"
+    original = "Hello <b>{{username}}</b>, how are you? I'm {{age}} years old!"
     msg = tool.Placeholderize(original)
     self.failUnless(msg.GetPresentableContent() ==
                     "Hello BEGIN_BOLDX_USERNAME_XEND_BOLD, how are you? I'm X_AGE_X years old!")
@@ -134,4 +134,3 @@ The installation will not proceed if you choose to cancel.
 
 if __name__ == '__main__':
   unittest.main()
-
