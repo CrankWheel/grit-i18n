@@ -1,2 +1,4 @@
 GRIT (Google Resource and Internationalization Tool) is a tool for Windows
 projects to manage resources and simplify the localization workflow.
+
+This is a fork of GRIT with some additions/changes specific to CrankWheel.
