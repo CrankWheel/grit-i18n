@@ -70,7 +70,7 @@ _BLOCK_TAGS = ['script', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'br',
               'button', 'option', 'map', 'area', 'blockquote', 'pre',
               'meta', 'xmp', 'noscript', 'label', 'tbody', 'thead',
               'script', 'style', 'pre', 'iframe', 'img', 'input', 'nowrap',
-              'fieldset', 'legend', 'canvas']
+              'fieldset', 'legend', 'canvas', 'footer']
 
 # HTML tags which may appear within a chunk.
 _INLINE_TAGS = ['b', 'i', 'u', 'tt', 'code', 'font', 'a', 'span', 'small',
