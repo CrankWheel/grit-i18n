@@ -68,6 +68,10 @@ def ToolFactoryXmb():
   import grit.tool.xmb
   return grit.tool.xmb.OutputXmb()
 
+def ToolFactoryXtb():
+  import grit.tool.xtb
+  return grit.tool.xtb.OutputXtbUntranslated()
+
 def ToolAndroid2Grd():
   import grit.tool.android2grd
   return grit.tool.android2grd.Android2Grd()
@@ -99,6 +103,7 @@ _TOOLS = [
                   _REQUIRES_INPUT : False }],
   ['unit', { _FACTORY : ToolFactoryUnit, _REQUIRES_INPUT : False }],
   ['xmb', { _FACTORY : ToolFactoryXmb, _REQUIRES_INPUT : True }],
+  ['xtb', { _FACTORY : ToolFactoryXtb, _REQUIRES_INPUT : True }],
   ['android2grd', {
       _FACTORY: ToolAndroid2Grd,
       _REQUIRES_INPUT : False }],
@@ -211,7 +216,7 @@ def Main(args):
   if sys.version_info < (2, 6):
     print "GRIT requires Python 2.6 or later."
     return 2
-  elif not args or (len(args) == 1 and args[0] == 'help'):
+  elif not args or (args[-1] == 'help'):
     PrintUsage()
     return 0
   elif len(args) == 2 and args[0] == 'help':
