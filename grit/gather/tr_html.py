@@ -63,7 +63,7 @@ from grit.gather import interface
 
 
 # HTML tags which break (separate) chunks.
-_BLOCK_TAGS = ['script', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'br',
+_BLOCK_TAGS = ['script', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr',
               'body', 'style', 'head', 'title', 'table', 'tr', 'td', 'th',
               'ul', 'ol', 'dl', 'nl', 'li', 'div', 'object', 'center',
               'html', 'link', 'form', 'select', 'textarea',
@@ -75,7 +75,7 @@ _BLOCK_TAGS = ['script', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'br',
 # HTML tags which may appear within a chunk.
 _INLINE_TAGS = ['b', 'i', 'u', 'tt', 'code', 'font', 'a', 'span', 'small',
                'key', 'nobr', 'url', 'em', 's', 'sup', 'strike',
-               'strong']
+               'strong', 'br']
 
 # HTML tags within which linebreaks are significant.
 _PREFORMATTED_TAGS = ['textarea', 'xmp', 'pre']
