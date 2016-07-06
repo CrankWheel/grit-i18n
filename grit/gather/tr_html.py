@@ -154,15 +154,15 @@ _ELEMENT = lazy_re.compile(r'''
 # writing out attributes, so we wouldn't know to escape spaces.
 _SPECIAL_ELEMENT = lazy_re.compile(r'''
   <\s*(
-    input[^>]+?value\s*=\s*(\'(?P<value3>[^\']*)\'|"(?P<value4>[^"]*)")
-    [^>]+type\s*=\s*"?'?(button|reset|text|submit)'?"?
+    input[^>]+?(value|placeholder)\s*=\s*(\'(?P<value3>[^\']*)\'|"(?P<value4>[^"]*)")
+    [^>]+type\s*=\s*"?'?(button|email|reset|text|submit)'?"?
     |
     (
       table[^>]+?title\s*=
       |
       img[^>]+?alt\s*=
       |
-      input[^>]+?type\s*=\s*"?'?(button|reset|text|submit)'?"?[^>]+?value\s*=
+      input[^>]+?type\s*=\s*"?'?(button|email|reset|text|submit)'?"?[^>]+?(value|placeholder)\s*=
     )
     \s*(\'(?P<value1>[^\']*)\'|"(?P<value2>[^"]*)")
   )[^>]*?>
