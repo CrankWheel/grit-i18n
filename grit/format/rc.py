@@ -86,6 +86,7 @@ _LANGUAGE_CHARSET_PAIR = {
   # No codepage for filipino, use unicode(1200).
   'fil'         : '046404e4',
   'fr'          : '040c04e4',
+  'fr-x-biling' : '040c04e4',
   'lv'          : '042604e9',
   'sv'          : '041d04e4',
   'ca'          : '040304e4',
@@ -182,6 +183,7 @@ _LANGUAGE_DIRECTIVE_PAIR = {
   # LANG_FILIPINO (100) not in VC 7 winnt.h.
   'fil'         : '100, SUBLANG_DEFAULT',
   'fr'          : 'LANG_FRENCH, SUBLANG_FRENCH',
+  'fr-x-biling' : 'LANG_FRENCH, SUBLANG_FRENCH',
   'lv'          : 'LANG_LATVIAN, SUBLANG_DEFAULT',
   'sv'          : 'LANG_SWEDISH, SUBLANG_SWEDISH',
   'ca'          : 'LANG_CATALAN, SUBLANG_DEFAULT',
