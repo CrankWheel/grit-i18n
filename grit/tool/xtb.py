@@ -106,6 +106,26 @@ def WriteXtbFile(file, messages):
   file.write('</translationbundle>')
 
 
+def WriteMessagesToFile(file, messages):
+  file.write('// Do not translate lines that start with //, like this one.\n//\n')
+  for message in messages:
+    file.write('// ID %s\n' % message.GetId())
+
+    parts = message.GetContent()
+    do_not_translate = []
+    for part in parts:
+      if isinstance(part, tclib.Placeholder):
+        do_not_translate += [part.GetPresentation()]
+
+    if do_not_translate:
+      file.write('// Please do not modify the following parts of this message:\n')
+      for dnt in do_not_translate:
+        file.write('// %s\n' % dnt)
+
+    file.write(message.GetPresentableContent().encode('utf-8'))
+    file.write('\n\n\n')
+
+
 class OutputXtbUntranslated(interface.Tool):
   """Outputs translateable messages in the .grd input file THAT DO NOT YET
 HAVE A TRANSLATION to an .xtb file, which is the format that Google's internal
@@ -141,7 +161,8 @@ Other options:
     limit_file = None
     limit_is_grd = False
     limit_file_dir = None
-    own_opts, args = getopt.getopt(args, 'D:E:')
+    output_xtb = True
+    own_opts, args = getopt.getopt(args, 'D:E:t')
     for key, val in own_opts:
       if key == '-D':
         name, val = util.ParseDefine(val)
@@ -149,6 +170,8 @@ Other options:
       elif key == '-E':
         (env_name, env_value) = val.split('=', 1)
         os.environ[env_name] = env_value
+      elif key == '-t':
+        output_xtb = False
     if not len(args) == 2:
       print ('grit xtb takes exactly two arguments, LANG and OUTPUTPATH')
       return 2
@@ -162,12 +185,12 @@ Other options:
     res_tree.RunGatherers()
 
     with open(xmb_path, 'wb') as output_file:
-      self.Process(lang, res_tree, output_file)
+      self.Process(lang, res_tree, output_file, output_xtb)
     if limit_file:
       limit_file.close()
     print "Wrote %s" % xmb_path
 
-  def Process(self, lang, res_tree, output_file):
+  def Process(self, lang, res_tree, output_file, output_xtb):
     """Writes a document with the contents of res_tree into output_file,
     limiting output to messages missing translations.
 
@@ -212,4 +235,7 @@ Other options:
     # Ensure a stable order of messages, to help regression testing.
     messages.sort(key=lambda x:x.GetId())
 
-    WriteXtbFile(output_file, messages)
+    if output_xtb:
+      WriteXtbFile(output_file, messages)
+    else:
+      WriteMessagesToFile(output_file, messages)
