@@ -130,6 +130,10 @@ _NONTRANSLATEABLES = lazy_re.compile(r'''
   <!\s*[A-Z]+\s*([^>]+|"[^"]+"|'[^']+')*?>
   |
   {{[#/^!>].*?}}
+  |
+  <\s*span\s+class="material-icons".+?</\s*span\s*>
+  |
+  <\s*div\s+class="material-icons".+?</\s*div\s*>
   ''', re.MULTILINE | re.DOTALL | re.VERBOSE | re.IGNORECASE)
 
 # Matches a tag and its attributes
@@ -162,7 +166,7 @@ _SPECIAL_ELEMENT = lazy_re.compile(r'''
       |
       img[^>]+?alt\s*=
       |
-      input[^>]+?type\s*=\s*"?'?(button|email|reset|text|submit)'?"?[^>]+?(value|placeholder)\s*=
+      input[^>]+?type\s*=\s*"?'?(button|email|reset|text|tel|submit)'?"?[^>]+?(value|placeholder)\s*=
     )
     \s*(\'(?P<value1>[^\']*)\'|"(?P<value2>[^"]*)")
   )[^>]*?>
