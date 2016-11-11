@@ -123,6 +123,44 @@ def WriteXmbFile(file, messages):
   file.write('</messagebundle>')
 
 
+# Good resource on POT format: http://pology.nedohodnik.net/doc/user/en_US/ch-poformat.html
+def WritePotFile(file, messages):
+  def WriteAttribute(prefix, value):
+    if value:
+      file.write('%s%s\n' % (prefix, value))
+
+  def WriteExamples():
+    parts = message.GetContent()
+    for part in parts:
+      if isinstance(part, tclib.Placeholder):
+        if part.GetExample():
+          file.write(u'#. - placeholder %s, example: %s\n' % (part.GetPresentation(), part.GetExample()))
+        else:
+          file.write(u'#. - placeholder %s, literally replaced with: %s\n' % (part.GetPresentation(), part.GetOriginal()))
+
+  def PotEscape(text):
+    return text.replace(u'\\', u'\\\\').replace(u'\n', u'\\n').replace(u'\t', u'\\t').replace(u'%', u'\%').encode('utf-8')
+
+  for message in messages:
+    WriteAttribute(u'#. - description:', message.GetDescription())
+    WriteExamples()
+    WriteAttribute(u'#: id: ', message.GetId())
+
+    meaning = message.GetMeaning()
+    if meaning:
+      file.write(u'msgctxt "%s"\n', PotEscape(meaning))
+    file.write(u'msgid "')
+    parts = message.GetContent()
+    for part in parts:
+      if isinstance(part, tclib.Placeholder):
+        file.write(u'%%{%s}' % part.GetPresentation())
+      else:
+        file.write(PotEscape(part))
+    file.write(u'"\n')
+    file.write(u'msgstr ""\n')
+    file.write(u'\n')
+
+
 class OutputXmb(interface.Tool):
   """Outputs all translateable messages in the .grd input file to an
 .xmb file, which is the format used to give source messages to
@@ -159,6 +197,7 @@ Other options:
   # The different output formats supported by this tool
   FORMAT_XMB = 0
   FORMAT_IDS_ONLY = 1
+  FORMAT_POT = 2
 
   def __init__(self, defines=None):
     super(OutputXmb, self).__init__()
@@ -174,7 +213,7 @@ Other options:
     limit_file = None
     limit_is_grd = False
     limit_file_dir = None
-    own_opts, args = getopt.getopt(args, 'l:D:ih')
+    own_opts, args = getopt.getopt(args, 'l:D:ihp')
     for key, val in own_opts:
       if key == '-l':
         limit_file = open(val, 'r')
@@ -184,6 +223,8 @@ Other options:
         limit_is_grd = os.path.splitext(val)[1] == '.grd'
       elif key == '-i':
         self.format = self.FORMAT_IDS_ONLY
+      elif key == '-p':
+        self.format = self.FORMAT_POT
       elif key == '-D':
         name, val = util.ParseDefine(val)
         self.defines[name] = val
@@ -286,6 +327,8 @@ Other options:
       for msg in messages:
         output_file.write(msg.GetId())
         output_file.write('\n')
+    elif self.format == self.FORMAT_POT:
+      WritePotFile(output_file, messages)
     else:
       assert self.format == self.FORMAT_XMB
       WriteXmbFile(output_file, messages)
