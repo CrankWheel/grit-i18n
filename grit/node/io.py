@@ -10,6 +10,7 @@ import os
 
 import grit.format.rc_header
 
+from grit import po_reader
 from grit import xtb_reader
 from grit.node import base
 
@@ -42,13 +43,22 @@ class FileNode(base.Node):
     defs = getattr(root, 'defines', {})
     target_platform = getattr(root, 'target_platform', '')
 
-    xtb_file = open(self.ToRealPath(self.GetInputPath()))
+    path = self.ToRealPath(self.GetInputPath())
+    xtb_file = open(path)
     try:
-      lang = xtb_reader.Parse(xtb_file,
-                              self.UberClique().GenerateXtbParserCallback(
-                                  self.attrs['lang'], debug=debug),
-                              defs=defs,
-                              target_platform=target_platform)
+      if path.endswith('.po') or path.endswith('.pot'):
+        lang = self.attrs['lang']
+        po_reader.Parse(xtb_file,
+                        self.UberClique().GenerateXtbParserCallback(
+                        self.attrs['lang'], debug=debug),
+                        defs=defs,
+                        target_platform=target_platform)
+      else:
+        lang = xtb_reader.Parse(xtb_file,
+                                self.UberClique().GenerateXtbParserCallback(
+                                    self.attrs['lang'], debug=debug),
+                                defs=defs,
+                                target_platform=target_platform)
     except:
       print "Exception during parsing of %s" % self.GetInputPath()
       raise
@@ -59,7 +69,7 @@ class FileNode(base.Node):
     ALTERNATIVE_LANG_CODE_MAP = { 'he': 'iw', 'nb': 'no' }
     assert (lang == self.attrs['lang'] or
             lang == ALTERNATIVE_LANG_CODE_MAP[self.attrs['lang']]), (
-            'The XTB file you reference must contain messages in the language '
+            'The translation file you reference must contain messages in the language '
             'specified\nby the \'lang\' attribute.')
 
   def GetInputPath(self):
@@ -116,4 +126,3 @@ class EmitNode(base.ContentNode):
   def GetEmitType(self):
     '''Returns the emit_type for this node. Default is 'append'.'''
     return self.attrs['emit_type']
-
