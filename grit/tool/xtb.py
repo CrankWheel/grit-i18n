@@ -16,6 +16,7 @@ from grit import lazy_re
 from grit import tclib
 from grit import util
 from grit.tool import interface
+from grit.tool import xmb
 
 
 # Used to collapse presentable content to determine if
@@ -161,8 +162,8 @@ Other options:
     limit_file = None
     limit_is_grd = False
     limit_file_dir = None
-    output_xtb = True
-    own_opts, args = getopt.getopt(args, 'D:E:t')
+    output_format = 'xtb'
+    own_opts, args = getopt.getopt(args, 'D:E:tp')
     for key, val in own_opts:
       if key == '-D':
         name, val = util.ParseDefine(val)
@@ -171,7 +172,9 @@ Other options:
         (env_name, env_value) = val.split('=', 1)
         os.environ[env_name] = env_value
       elif key == '-t':
-        output_xtb = False
+        output_format = 'text'
+      elif key == '-p':
+        output_format = 'pot'
     if not len(args) == 2:
       print ('grit xtb takes exactly two arguments, LANG and OUTPUTPATH')
       return 2
@@ -185,12 +188,12 @@ Other options:
     res_tree.RunGatherers()
 
     with open(xmb_path, 'wb') as output_file:
-      self.Process(lang, res_tree, output_file, output_xtb)
+      self.Process(lang, res_tree, output_file, output_format)
     if limit_file:
       limit_file.close()
     print "Wrote %s" % xmb_path
 
-  def Process(self, lang, res_tree, output_file, output_xtb):
+  def Process(self, lang, res_tree, output_file, output_format):
     """Writes a document with the contents of res_tree into output_file,
     limiting output to messages missing translations.
 
@@ -235,7 +238,11 @@ Other options:
     # Ensure a stable order of messages, to help regression testing.
     messages.sort(key=lambda x:x.GetId())
 
-    if output_xtb:
+    if output_format == 'xtb':
       WriteXtbFile(output_file, messages)
-    else:
+    elif output_format == 'text':
       WriteMessagesToFile(output_file, messages)
+    elif output_format == 'pot':
+      xmb.WritePotFile(output_file, messages)
+    else:
+      print "Unknown message format."
