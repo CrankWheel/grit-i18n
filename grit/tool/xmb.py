@@ -148,7 +148,7 @@ def WritePotFile(file, messages):
 
     meaning = message.GetMeaning()
     if meaning:
-      file.write(u'msgctxt "%s"\n', PotEscape(meaning))
+      file.write(u'msgctxt "%s"\n' % PotEscape(meaning))
     file.write(u'msgid "')
     parts = message.GetContent()
     for part in parts:
