@@ -124,7 +124,7 @@ def WriteXmbFile(file, messages):
 
 
 # Good resource on POT format: http://pology.nedohodnik.net/doc/user/en_US/ch-poformat.html
-def WritePotFile(file, messages):
+def WritePotFile(file, cliques, lang='', include_translation=False):
   def WriteAttribute(prefix, value):
     if value:
       file.write('%s%s\n' % (prefix, value))
@@ -141,7 +141,8 @@ def WritePotFile(file, messages):
   def PotEscape(text):
     return text.replace(u'\\', u'\\\\').replace(u'\n', u'\\n').replace(u'\t', u'\\t').replace(u'%', u'\%').encode('utf-8')
 
-  for message in messages:
+  for clique in cliques:
+    message = clique.GetMessage()
     WriteAttribute(u'#. - description:', message.GetDescription())
     WriteExamples()
     WriteAttribute(u'#: id: ', message.GetId())
@@ -149,15 +150,23 @@ def WritePotFile(file, messages):
     meaning = message.GetMeaning()
     if meaning:
       file.write(u'msgctxt "%s"\n' % PotEscape(meaning))
-    file.write(u'msgid "')
-    parts = message.GetContent()
-    for part in parts:
-      if isinstance(part, tclib.Placeholder):
-        file.write(u'%%{%s}' % part.GetPresentation())
-      else:
-        file.write(PotEscape(part))
-    file.write(u'"\n')
-    file.write(u'msgstr ""\n')
+    def WriteMessagePart(key, msg):
+        file.write(u'%s "' % key)
+        parts = msg.GetContent()
+        for part in parts:
+          if isinstance(part, tclib.Placeholder):
+            file.write(u'%%{%s}' % part.GetPresentation())
+          else:
+            file.write(PotEscape(part))
+        file.write(u'"\n')
+    WriteMessagePart(u'msgid', message)
+    if not include_translation:
+      file.write(u'msgstr ""\n')
+    else:
+      WriteMessagePart(u'msgstr',
+                       clique.MessageForLanguage(lang,
+                                                 pseudo_if_no_match=False,
+                                                 fallback_to_english=False))
     file.write(u'\n')
 
 
@@ -287,7 +296,7 @@ Other options:
         limit_list = [item.strip() for item in limit_file.read().split('\n')]
 
     ids_already_done = {}
-    messages = []
+    cliques = []
     for node in res_tree:
       if (limit_file and
           not ('name' in node.attrs and node.attrs['name'] in limit_list)):
@@ -316,11 +325,12 @@ Other options:
           continue
         ids_already_done[id] = 1
 
-        message = node.UberClique().BestClique(id).GetMessage()
-        messages += [message]
+        clique = node.UberClique().BestClique(id)
+        cliques += [clique]
 
     # Ensure a stable order of messages, to help regression testing.
-    messages.sort(key=lambda x:x.GetId())
+    cliques.sort(key=lambda x:x.GetMessage().GetId())
+    messages = [c.GetMessage() for c in cliques]
 
     if self.format == self.FORMAT_IDS_ONLY:
       # We just print the list of IDs to the output file.
@@ -328,7 +338,7 @@ Other options:
         output_file.write(msg.GetId())
         output_file.write('\n')
     elif self.format == self.FORMAT_POT:
-      WritePotFile(output_file, messages)
+      WritePotFile(output_file, cliques)
     else:
       assert self.format == self.FORMAT_XMB
       WriteXmbFile(output_file, messages)

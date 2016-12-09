@@ -231,5 +231,3 @@ class Placeholder(grit.extern.tclib.Placeholder):
 
   def GetExample(self):
     return self.example
-
-

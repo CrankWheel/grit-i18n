@@ -152,6 +152,8 @@ Other options:
   def __init__(self, defines=None):
     super(OutputXtbUntranslated, self).__init__()
     self.defines = defines or {}
+    self.include_all = False
+    self.output_only_translated = False
 
   def ShortDescription(self):
     return 'Exports all untranslated messages into an XTB file.'
@@ -163,7 +165,9 @@ Other options:
     limit_is_grd = False
     limit_file_dir = None
     output_format = 'xtb'
-    own_opts, args = getopt.getopt(args, 'D:E:tp')
+    include_all = False
+    output_only_translated = False
+    own_opts, args = getopt.getopt(args, 'D:E:tpAT')
     for key, val in own_opts:
       if key == '-D':
         name, val = util.ParseDefine(val)
@@ -175,6 +179,10 @@ Other options:
         output_format = 'text'
       elif key == '-p':
         output_format = 'pot'
+      elif key == '-A':
+        self.include_all = True
+      elif key == '-T':
+        self.output_only_translated = True
     if not len(args) == 2:
       print ('grit xtb takes exactly two arguments, LANG and OUTPUTPATH')
       return 2
@@ -203,7 +211,7 @@ Other options:
       output_file: file open for writing
     """
     ids_already_done = {}
-    messages = []
+    cliques = []
     for node in res_tree:
       if not node.IsTranslateable():
         continue
@@ -230,19 +238,31 @@ Other options:
         ids_already_done[id] = 1
 
         clique = node.UberClique().BestClique(id)
-        message = clique.GetMessage()
-        # This indicates that there is no translation.
-        if not lang in clique.clique.keys():
-          messages += [message]
+        # We output in three cases:
+        # - We were asked to output only untranslated messages and this
+        #   message is not translated (this is the default case)
+        # - We were asked to output only translated messages and this
+        #   message is translated
+        # - We were asked to output all messages
+        message_has_translation = lang in clique.clique.keys()
+        if self.include_all:
+          cliques += [clique]
+        elif self.output_only_translated:
+          if message_has_translation:
+            cliques += [clique]
+        else:
+          if not message_has_translation:
+            cliques += [clique]
 
     # Ensure a stable order of messages, to help regression testing.
-    messages.sort(key=lambda x:x.GetId())
+    cliques.sort(key=lambda x:x.GetMessage().GetId())
+    messages = [c.GetMessage() for c in cliques]
 
     if output_format == 'xtb':
       WriteXtbFile(output_file, messages)
     elif output_format == 'text':
       WriteMessagesToFile(output_file, messages)
     elif output_format == 'pot':
-      xmb.WritePotFile(output_file, messages)
+      xmb.WritePotFile(output_file, cliques, lang=lang, include_translation=self.output_only_translated)
     else:
       print "Unknown message format."
