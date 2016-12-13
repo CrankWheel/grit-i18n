@@ -127,10 +127,9 @@ def WriteMessagesToFile(file, messages):
     file.write('\n\n\n')
 
 
-def WriteGengoFile(lang, file, messages):
+def WriteGengoFile(file, messages):
   def GengoEscape(str):
     return str.encode('utf-8')
-  file.write(u'[[[ Translations from en to %s ]]]\n\n' % lang)
   for message in messages:
     description = message.GetDescription()
     if description:
@@ -291,6 +290,6 @@ Other options:
     elif output_format == 'pot':
       xmb.WritePotFile(output_file, cliques, lang=lang, include_translation=self.output_only_translated)
     elif output_format == 'gengo':
-      WriteGengoFile(lang, output_file, messages)
+      WriteGengoFile(output_file, messages)
     else:
       print "Unknown message format."

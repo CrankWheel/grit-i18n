@@ -10,6 +10,7 @@ import os
 
 import grit.format.rc_header
 
+from grit import gengo_reader
 from grit import po_reader
 from grit import xtb_reader
 from grit.node import base
@@ -57,9 +58,7 @@ class FileNode(base.Node):
         lang = self.attrs['lang']
         gengo_reader.Parse(xtb_file,
                            self.UberClique().GenerateXtbParserCallback(
-                              self.attrs['lang'], debug=debug),
-                           defs=defs,
-                           target_platform=target_platform)
+                              self.attrs['lang'], debug=debug))
       else:
         lang = xtb_reader.Parse(xtb_file,
                                 self.UberClique().GenerateXtbParserCallback(
