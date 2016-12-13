@@ -50,9 +50,16 @@ class FileNode(base.Node):
         lang = self.attrs['lang']
         po_reader.Parse(xtb_file,
                         self.UberClique().GenerateXtbParserCallback(
-                        self.attrs['lang'], debug=debug),
+                            self.attrs['lang'], debug=debug),
                         defs=defs,
                         target_platform=target_platform)
+      elif path.endswith('.gengo'):
+        lang = self.attrs['lang']
+        gengo_reader.Parse(xtb_file,
+                           self.UberClique().GenerateXtbParserCallback(
+                              self.attrs['lang'], debug=debug),
+                           defs=defs,
+                           target_platform=target_platform)
       else:
         lang = xtb_reader.Parse(xtb_file,
                                 self.UberClique().GenerateXtbParserCallback(
