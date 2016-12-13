@@ -127,6 +127,30 @@ def WriteMessagesToFile(file, messages):
     file.write('\n\n\n')
 
 
+def WriteGengoFile(lang, file, messages):
+  def GengoEscape(str):
+    return str.encode('utf-8')
+  file.write(u'[[[ Translations from en to %s ]]]\n\n' % lang)
+  for message in messages:
+    description = message.GetDescription()
+    if description:
+      file.write(u'[[[ Description: %s ]]]\n' % message.GetDescription())
+    meaning = message.GetMeaning()
+    if meaning:
+      file.write(u'[[[ Context: %s ]]]\n' % meaning)
+    file.write(u'[[[.BEGIN.%s.]]]' % message.GetId())
+    parts = message.GetContent()
+    for part in parts:
+      if isinstance(part, tclib.Placeholder):
+        example = part.GetExample()
+        if not example:
+          example = GengoEscape(part.GetOriginal())
+        file.write(u'[[[%s|%s]]]' % (part.GetPresentation(), example))
+      else:
+        file.write(GengoEscape(part))
+    file.write(u'[[[.END.]]]\n\n')
+
+
 class OutputXtbUntranslated(interface.Tool):
   """Outputs translateable messages in the .grd input file THAT DO NOT YET
 HAVE A TRANSLATION to an .xtb file, which is the format that Google's internal
@@ -167,7 +191,7 @@ Other options:
     output_format = 'xtb'
     include_all = False
     output_only_translated = False
-    own_opts, args = getopt.getopt(args, 'D:E:tpAT')
+    own_opts, args = getopt.getopt(args, 'D:E:tpgAT')
     for key, val in own_opts:
       if key == '-D':
         name, val = util.ParseDefine(val)
@@ -179,6 +203,8 @@ Other options:
         output_format = 'text'
       elif key == '-p':
         output_format = 'pot'
+      elif key == '-g':
+        output_format = 'gengo'
       elif key == '-A':
         self.include_all = True
       elif key == '-T':
@@ -264,5 +290,7 @@ Other options:
       WriteMessagesToFile(output_file, messages)
     elif output_format == 'pot':
       xmb.WritePotFile(output_file, cliques, lang=lang, include_translation=self.output_only_translated)
+    elif output_format == 'gengo':
+      WriteGengoFile(lang, output_file, messages)
     else:
       print "Unknown message format."
