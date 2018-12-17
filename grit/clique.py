@@ -452,7 +452,8 @@ class MessageClique(object):
       raise exception.InvalidTranslation(
         'Msg ID %s, transl ID %s' % (self.GetId(), translation.GetId()))
 
-    assert not language in self.clique
+    if language in self.clique:
+        raise exception.InvalidTranslation('Duplicate msg ID %s' % translation.GetId())
 
     # Because two messages can differ in the original content of their
     # placeholders yet share the same ID (because they are otherwise the
@@ -480,4 +481,3 @@ class MessageClique(object):
         language, transl_msg.GetId())
 
     self.clique[language] = transl_msg
-
