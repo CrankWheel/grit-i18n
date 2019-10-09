@@ -425,7 +425,7 @@ def FormatInclude(item, lang, output_dir, type=None, process_html=False):
   else:
     assert (isinstance(item, structure.StructureNode) and item.attrs['type'] in
         ['admin_template', 'chrome_html', 'chrome_scaled_image', 'igoogle',
-         'muppet', 'tr_html', 'txt'])
+         'muppet', 'tr_html', 'txt', 'dod_template'])
     filename_only = False
     relative_path = False
 
@@ -475,6 +475,7 @@ _STRUCTURE_FORMATTERS = {
   'tr_html'             : partial(FormatInclude, type='HTML'),
   'txt'                 : partial(FormatInclude, type='TXT'),
   'policy_template_metafile': _DoNotFormat,
+  'dod_template'        : partial(FormatInclude, type='DODTEMPL')
 }
 
 

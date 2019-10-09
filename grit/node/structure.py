@@ -16,6 +16,7 @@ from grit.node import base
 from grit.node import variant
 
 import grit.gather.admin_template
+import grit.gather.dod_template
 import grit.gather.chrome_html
 import grit.gather.chrome_scaled_image
 import grit.gather.igoogle_strings
@@ -43,6 +44,7 @@ _GATHERERS = {
   'txt'                 : grit.gather.txt.TxtFile,
   'version'             : grit.gather.rc.Version,
   'policy_template_metafile' : grit.gather.policy_json.PolicyJson,
+  'dod_template'        : grit.gather.dod_template.DodTemplate,
 }
 
 
@@ -243,7 +245,7 @@ class StructureNode(base.Node):
   def HasFileForLanguage(self):
     return self.attrs['type'] in ['tr_html', 'admin_template', 'txt',
                                   'muppet', 'igoogle', 'chrome_scaled_image',
-                                  'chrome_html']
+                                  'chrome_html', 'dod_template']
 
   def ExpandVariables(self):
     '''Variable expansion on structures is controlled by an XML attribute.
@@ -367,4 +369,3 @@ class StructureNode(base.Node):
     assert hasattr(self, 'gatherer')
     if self.ExpandVariables():
       self.gatherer.SubstituteMessages(substituter)
-
