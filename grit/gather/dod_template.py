@@ -32,7 +32,7 @@ class DodTemplate(interface.GathererBase):
       return tree
     else:
       clique = self.uberclique.BestClique(message.GetId())
-      content = clique.MessageForLanguage(self.lang_, False, False).GetRealContent()
+      content = clique.MessageForLanguage(self.lang_, self.pseudo_if_not_available_, self.fallback_to_english_).GetRealContent()
       return content
 
   def ProcessDict(self, is_gather, output, prefix, tree):
