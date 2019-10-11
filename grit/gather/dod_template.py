@@ -22,24 +22,18 @@ class DodTemplate(interface.GathererBase):
 
   def GetText(self):
     '''Returns the original text of the HTML document'''
-    return self.text_
+    return self.original_text_
 
   def ProcessString(self, is_gather, output, prefix, tree):
-    clique = self.uberclique.MakeClique(tclib.Message(text=tree, description=prefix))
+    message = tclib.Message(text=tree, description=prefix)
     if is_gather:
+      clique = self.uberclique.MakeClique(message)
       output = output.append(clique)
       return tree
     else:
-      msg = clique.MessageForLanguage(self.lang_, self.pseudo_if_not_available_, self.fallback_to_english_)
-      out = ''
-      for content in msg.GetContent():
-        if isinstance(content, tclib.Placeholder):
-          out += content.GetOriginal()
-        else:
-          # We escape " characters to increase the chance that attributes
-          # will be properly escaped.
-          out += content
-      return out
+      clique = self.uberclique.BestClique(message.GetId())
+      content = clique.MessageForLanguage(self.lang_, False, False).GetRealContent()
+      return content
 
   def ProcessDict(self, is_gather, output, prefix, tree):
     new_dict = {}
@@ -97,3 +91,4 @@ class DodTemplate(interface.GathererBase):
       text = text[1:]
     self.original_text_ = text
     self.original_tree_ = json.loads(text)
+    self.GetCliques()  # So that UberClique gets populated.
