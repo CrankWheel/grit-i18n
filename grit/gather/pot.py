@@ -28,16 +28,41 @@ def Escape(msg):
 
 
 def GetPlaceholderizedText(msg):
+  tags_encountered = {}
+  def AssertIfSameTagTwice(tag_name):
+    tag_name = tag_name.upper()
+    if tag_name in tags_encountered.keys():
+      raise "This gatherer can't handle the same tag twice in a message"
+    else:
+      tags_encountered[tag_name] = 1
+
   def Replacement(matchobj):
-    return matchobj.group(1).upper()
-  return re.sub('%{([^}]+)}', Replacement, msg)
+    (gettext_ph, open_tag_contents, open_tag, close_tag_contents, close_tag, unary_tag_contents, unary_tag) = matchobj.groups()
+    if gettext_ph:
+      return gettext_ph.upper()
+    elif open_tag:
+      AssertIfSameTagTwice(open_tag)
+      return 'BEGIN_' + open_tag.upper()
+    elif close_tag:
+      return 'END_' + close_tag.upper()
+    elif unary_tag:
+      AssertIfSameTagTwice(unary_tag)
+      return unary_tag.upper()
+  return re.sub('%{([^}]+)}|<(([a-zA-Z]+)[^>^/]*)>|</(([a-zA-Z]+)[^>^/]*)>|<(([a-zA-Z]+)[^>^/]*)/>', Replacement, msg)
 
 
 def GetPlaceholders(msg):
-  ph_names = re.findall('%{([^}]+)}', msg)
+  ph_names = re.findall('%{([^}]+)}|<(([a-zA-Z]+)[^>^/]*)>|</(([a-zA-Z]+)[^>^/]*)>|<(([a-zA-Z]+)[^>^/]*)/>', msg)
   placeholders = []
-  for ph in ph_names:
-    placeholders.append(tclib.Placeholder(ph.upper(), '%%{%s}' % ph, '(replaceable)'))
+  for (gettext_ph, open_tag_contents, open_tag, close_tag_contents, close_tag, unary_tag_contents, unary_tag) in ph_names:
+    if gettext_ph != '':
+      placeholders.append(tclib.Placeholder(gettext_ph.upper(), '%%{%s}' % gettext_ph, '(replaceable)'))
+    elif open_tag != '':
+      placeholders.append(tclib.Placeholder('BEGIN_' + open_tag.upper(), '<%s>' % open_tag_contents, '(HTML code)'))
+    elif close_tag != '':
+      placeholders.append(tclib.Placeholder('END_' + close_tag.upper(), '</%s>' % close_tag_contents, '(HTML code)'))
+    elif unary_tag != '':
+      placeholders.append(tclib.Placeholder(unary_tag.upper(), '<%s/>' % unary_tag_contents, '(HTML code)'))
   return placeholders
 
 

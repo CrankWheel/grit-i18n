@@ -24,6 +24,10 @@ msgid ""
 msgstr ""
 
 #: web/controllers/auth_controller_common.ex:139
+msgid "Hello <font size='+1'>user!</font>, <span>how are you?</span>"
+msgstr ""
+
+#: web/controllers/auth_controller_common.ex:139
 msgid "Email domain reserved for %{lname} (%{sname}). Please contact your administrator for access."
 msgstr ""
 
@@ -36,7 +40,12 @@ msgid "Recording \\ \"preview\""
 msgstr ""
 """
 
-INTENDED_OUTPUT = ur"""msgid "Email domain reserved for %{lname} (%{sname}). Please contact your administrator for access."
+
+INTENDED_OUTPUT = ur"""msgid "Hello <font size='+1'>user!</font>, <span>how are you?</span>"
+msgstr "HéPéllôPô <font size='+1'>üPüséPér!</font>, <span>hôPôw åPåréPé ýôüPýôü?</span>"
+
+
+msgid "Email domain reserved for %{lname} (%{sname}). Please contact your administrator for access."
 msgstr "ÉPÉmåïPåïl dôPômåïPåïn réPéséPérvéPéd fôPôr %{lname} (%{sname}). PléåPéåséPé côPôntåPåct ýôüPýôür åPådmïPïnïPïstråPåtôPôr fôPôr åPåccéPéss."
 
 
@@ -55,9 +64,15 @@ class PotUnittest(unittest.TestCase):
     gatherer = pot.PotFile(input)
     gatherer.Parse()
     self.failUnless(gatherer.GetText() == input.getvalue())
-    self.failUnless(len(gatherer.GetCliques()) == 3)
+    self.failUnless(len(gatherer.GetCliques()) == 4)
     self.failUnless(gatherer.GetCliques()[0].GetMessage().GetRealContent() ==
+                    r"Hello <font size='+1'>user!</font>, <span>how are you?</span>")
+    self.failUnless(gatherer.GetCliques()[0].GetMessage().GetPresentableContent() ==
+                    r"Hello BEGIN_FONTuser!END_FONT, BEGIN_SPANhow are you?END_SPAN")
+    self.failUnless(gatherer.GetCliques()[1].GetMessage().GetRealContent() ==
                     r"Email domain reserved for %{lname} (%{sname}). Please contact your administrator for access.")
+    self.failUnless(gatherer.GetCliques()[1].GetMessage().GetPresentableContent() ==
+                    r"Email domain reserved for LNAME (SNAME). Please contact your administrator for access.")
     self.failUnless(gatherer.Translate('fr').strip() == INTENDED_OUTPUT.strip())
 
 
