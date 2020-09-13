@@ -247,7 +247,7 @@ class StructureNode(base.Node):
   def HasFileForLanguage(self):
     return self.attrs['type'] in ['tr_html', 'admin_template', 'txt',
                                   'muppet', 'igoogle', 'chrome_scaled_image',
-                                  'chrome_html', 'dod_template']
+                                  'chrome_html', 'dod_template', 'pot']
 
   def ExpandVariables(self):
     '''Variable expansion on structures is controlled by an XML attribute.
