@@ -22,6 +22,7 @@ import grit.gather.chrome_scaled_image
 import grit.gather.igoogle_strings
 import grit.gather.muppet_strings
 import grit.gather.policy_json
+import grit.gather.pot
 import grit.gather.rc
 import grit.gather.tr_html
 import grit.gather.txt
@@ -39,6 +40,7 @@ _GATHERERS = {
   'igoogle'             : grit.gather.igoogle_strings.IgoogleStrings,
   'menu'                : grit.gather.rc.Menu,
   'muppet'              : grit.gather.muppet_strings.MuppetStrings,
+  'pot'                 : grit.gather.pot.PotFile,
   'rcdata'              : grit.gather.rc.RCData,
   'tr_html'             : grit.gather.tr_html.TrHtml,
   'txt'                 : grit.gather.txt.TxtFile,
