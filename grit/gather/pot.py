@@ -13,6 +13,10 @@ import re
 
 MSG_RE = re.compile('^\s*\msgid\s"(?P<msg>.+)\"\s*$')
 
+_HTML_PLACEHOLDER_NAMES = { 'a' : 'link', 'br' : 'break', 'b' : 'bold',
+  'i' : 'italic', 'li' : 'item', 'ol' : 'ordered_list', 'p' : 'paragraph',
+  'ul' : 'unordered_list', 'img' : 'image', 'em' : 'emphasis' }
+
 
 def Unescape(msg):
   msg = msg.replace("\\n", "\n")
@@ -25,6 +29,17 @@ def Escape(msg):
   msg = msg.replace("\"", "\\\"")
   msg = msg.replace("\n", "\\n")
   return msg
+
+
+def MakeHtmlPlaceholderName(tag_name, type = None):
+  if tag_name in _HTML_PLACEHOLDER_NAMES:  # use meaningful names
+    tag_name = _HTML_PLACEHOLDER_NAMES[tag_name]
+  if type == 'begin':
+    return 'BEGIN_' + tag_name.upper()
+  elif type == 'end':
+    return 'END_' + tag_name.upper()
+  else:
+    return tag_name.upper()
 
 
 def GetPlaceholderizedText(msg):
@@ -42,12 +57,12 @@ def GetPlaceholderizedText(msg):
       return gettext_ph.upper()
     elif open_tag:
       AssertIfSameTagTwice(open_tag)
-      return 'BEGIN_' + open_tag.upper()
+      return MakeHtmlPlaceholderName(open_tag, 'begin')
     elif close_tag:
-      return 'END_' + close_tag.upper()
+      return MakeHtmlPlaceholderName(close_tag, 'end')
     elif unary_tag:
       AssertIfSameTagTwice(unary_tag)
-      return unary_tag.upper()
+      return MakeHtmlPlaceholderName(unary_tag)
   return re.sub('%{([^}]+)}|<(([a-zA-Z]+)[^>^/]*)>|</(([a-zA-Z]+)[^>^/]*)>|<(([a-zA-Z]+)[^>^/]*)/>', Replacement, msg)
 
 
@@ -58,11 +73,11 @@ def GetPlaceholders(msg):
     if gettext_ph != '':
       placeholders.append(tclib.Placeholder(gettext_ph.upper(), '%%{%s}' % gettext_ph, '(replaceable)'))
     elif open_tag != '':
-      placeholders.append(tclib.Placeholder('BEGIN_' + open_tag.upper(), '<%s>' % open_tag_contents, '(HTML code)'))
+      placeholders.append(tclib.Placeholder(MakeHtmlPlaceholderName(open_tag, 'begin'), '<%s>' % open_tag_contents, '(HTML code)'))
     elif close_tag != '':
-      placeholders.append(tclib.Placeholder('END_' + close_tag.upper(), '</%s>' % close_tag_contents, '(HTML code)'))
+      placeholders.append(tclib.Placeholder(MakeHtmlPlaceholderName(close_tag, 'end'), '</%s>' % close_tag_contents, '(HTML code)'))
     elif unary_tag != '':
-      placeholders.append(tclib.Placeholder(unary_tag.upper(), '<%s/>' % unary_tag_contents, '(HTML code)'))
+      placeholders.append(tclib.Placeholder(MakeHtmlPlaceholderName(unary_tag), '<%s/>' % unary_tag_contents, '(HTML code)'))
   return placeholders
 
 

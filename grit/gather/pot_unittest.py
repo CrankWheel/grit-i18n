@@ -24,7 +24,7 @@ msgid ""
 msgstr ""
 
 #: web/controllers/auth_controller_common.ex:139
-msgid "Hello <font size='+1'>user!</font>, <span>how are you?</span>"
+msgid "Hello <font size='+1'>user!</font>, <i>how are you?</i>"
 msgstr ""
 
 #: web/controllers/auth_controller_common.ex:139
@@ -41,8 +41,8 @@ msgstr ""
 """
 
 
-INTENDED_OUTPUT = ur"""msgid "Hello <font size='+1'>user!</font>, <span>how are you?</span>"
-msgstr "HéPéllôPô <font size='+1'>üPüséPér!</font>, <span>hôPôw åPåréPé ýôüPýôü?</span>"
+INTENDED_OUTPUT = ur"""msgid "Hello <font size='+1'>user!</font>, <i>how are you?</i>"
+msgstr "HéPéllôPô <font size='+1'>üPüséPér!</font>, <i>hôPôw åPåréPé ýôüPýôü?</i>"
 
 
 msgid "Email domain reserved for %{lname} (%{sname}). Please contact your administrator for access."
@@ -66,9 +66,9 @@ class PotUnittest(unittest.TestCase):
     self.failUnless(gatherer.GetText() == input.getvalue())
     self.failUnless(len(gatherer.GetCliques()) == 4)
     self.failUnless(gatherer.GetCliques()[0].GetMessage().GetRealContent() ==
-                    r"Hello <font size='+1'>user!</font>, <span>how are you?</span>")
+                    r"Hello <font size='+1'>user!</font>, <i>how are you?</i>")
     self.failUnless(gatherer.GetCliques()[0].GetMessage().GetPresentableContent() ==
-                    r"Hello BEGIN_FONTuser!END_FONT, BEGIN_SPANhow are you?END_SPAN")
+                    r"Hello BEGIN_FONTuser!END_FONT, BEGIN_ITALIChow are you?END_ITALIC")
     self.failUnless(gatherer.GetCliques()[1].GetMessage().GetRealContent() ==
                     r"Email domain reserved for %{lname} (%{sname}). Please contact your administrator for access.")
     self.failUnless(gatherer.GetCliques()[1].GetMessage().GetPresentableContent() ==
