@@ -63,11 +63,11 @@ def GetPlaceholderizedText(msg):
     elif unary_tag:
       AssertIfSameTagTwice(unary_tag)
       return MakeHtmlPlaceholderName(unary_tag)
-  return re.sub('%{([^}]+)}|<(([a-zA-Z]+)[^>^/]*)>|</(([a-zA-Z]+)[^>^/]*)>|<(([a-zA-Z]+)[^>^/]*)/>', Replacement, msg)
+  return re.sub('%{([^}]+)}|<(([a-zA-Z]+)[^>]*)>|</(([a-zA-Z]+)[^>]*)>|<(([a-zA-Z]+)[^>]*)/>', Replacement, msg)
 
 
 def GetPlaceholders(msg):
-  ph_names = re.findall('%{([^}]+)}|<(([a-zA-Z]+)[^>^/]*)>|</(([a-zA-Z]+)[^>^/]*)>|<(([a-zA-Z]+)[^>^/]*)/>', msg)
+  ph_names = re.findall('%{([^}]+)}|<(([a-zA-Z]+)[^>]*)>|</(([a-zA-Z]+)[^>]*)>|<(([a-zA-Z]+)[^>]*)/>', msg)
   placeholders = []
   for (gettext_ph, open_tag_contents, open_tag, close_tag_contents, close_tag, unary_tag_contents, unary_tag) in ph_names:
     if gettext_ph != '':

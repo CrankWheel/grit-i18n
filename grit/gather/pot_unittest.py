@@ -38,6 +38,9 @@ msgstr ""
 #: web/templates/webext/recording.html.eex:19
 msgid "Recording \\ \"preview\""
 msgstr ""
+
+msgid "To activate phone conferencing we need to sign you up to use <a href=\"https://www.conferencecall.co.uk/?utm_source=crankwheel&utm_campaign=options_page&utm_medium=affiliate\" target=\"_blank\">ConferenceCall.co.uk</a> services using your email address, <strong class=\"user-email-address\"></strong>."
+msgstr ""
 """
 
 
@@ -55,6 +58,10 @@ msgstr "SüPüccéPéss!\nGôPô åPåhéåPéåd!!"
 
 msgid "Recording \\ \"preview\""
 msgstr "RéPécôPôrdïPïng \\ \"préPévïéPïéw\""
+
+
+msgid "To activate phone conferencing we need to sign you up to use <a href=\"https://www.conferencecall.co.uk/?utm_source=crankwheel&utm_campaign=options_page&utm_medium=affiliate\" target=\"_blank\">ConferenceCall.co.uk</a> services using your email address, <strong class=\"user-email-address\"></strong>."
+msgstr "TôPô åPåctïPïvåPåtéPé phôPônéPé côPônféPéréPéncïPïng wéPé nééPééd tôPô sïPïgn ýôüPýôü üPüp tôPô üPüséPé <a href=\"https://www.conferencecall.co.uk/?utm_source=crankwheel&utm_campaign=options_page&utm_medium=affiliate\" target=\"_blank\">CôPônféPéréPéncéPéCåPåll.côPô.üPük</a> séPérvïPïcéPés üPüsïPïng ýôüPýôür éPémåïPåïl åPåddréPéss, <strong class=\"user-email-address\"></strong>."
 """
 
 
@@ -64,7 +71,7 @@ class PotUnittest(unittest.TestCase):
     gatherer = pot.PotFile(input)
     gatherer.Parse()
     self.failUnless(gatherer.GetText() == input.getvalue())
-    self.failUnless(len(gatherer.GetCliques()) == 4)
+    self.failUnless(len(gatherer.GetCliques()) == 5)
     self.failUnless(gatherer.GetCliques()[0].GetMessage().GetRealContent() ==
                     r"Hello <font size='+1'>user!</font>, <i>how are you?</i>")
     self.failUnless(gatherer.GetCliques()[0].GetMessage().GetPresentableContent() ==
