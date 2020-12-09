@@ -31,53 +31,58 @@ def Escape(msg):
   return msg
 
 
-def MakeHtmlPlaceholderName(tag_name, type = None):
+def MakeHtmlPlaceholderName(tag_name, type, existing_tags):
+  # The way we do this is a bit limited in case tags of the same type are
+  # nested, but this will never (or at least almost never?) happen for the
+  # types of tags that can be embedded in messages.
+  exist_count = len([name for name in existing_tags if name == tag_name])
+  postfix = ''
+  if exist_count > 1:
+    postfix = '_%d' % exist_count
+
   if tag_name in _HTML_PLACEHOLDER_NAMES:  # use meaningful names
     tag_name = _HTML_PLACEHOLDER_NAMES[tag_name]
+
   if type == 'begin':
-    return 'BEGIN_' + tag_name.upper()
+    return 'BEGIN_' + tag_name.upper() + postfix
   elif type == 'end':
-    return 'END_' + tag_name.upper()
+    return 'END_' + tag_name.upper() + postfix
   else:
-    return tag_name.upper()
+    return tag_name.upper() + postfix
 
 
 def GetPlaceholderizedText(msg):
-  tags_encountered = {}
-  def AssertIfSameTagTwice(tag_name):
-    tag_name = tag_name.upper()
-    if tag_name in tags_encountered.keys():
-      raise "This gatherer can't handle the same tag twice in a message"
-    else:
-      tags_encountered[tag_name] = 1
-
+  tag_list = []
   def Replacement(matchobj):
     (gettext_ph, open_tag_contents, open_tag, close_tag_contents, close_tag, unary_tag_contents, unary_tag) = matchobj.groups()
     if gettext_ph:
       return gettext_ph.upper()
     elif open_tag:
-      AssertIfSameTagTwice(open_tag)
-      return MakeHtmlPlaceholderName(open_tag, 'begin')
+      tag_list.append(open_tag)
+      return MakeHtmlPlaceholderName(open_tag, 'begin', tag_list)
     elif close_tag:
-      return MakeHtmlPlaceholderName(close_tag, 'end')
+      return MakeHtmlPlaceholderName(close_tag, 'end', tag_list)
     elif unary_tag:
-      AssertIfSameTagTwice(unary_tag)
-      return MakeHtmlPlaceholderName(unary_tag)
-  return re.sub('%{([^}]+)}|<(([a-zA-Z]+)[^>]*)>|</(([a-zA-Z]+)[^>]*)>|<(([a-zA-Z]+)[^>]*)/>', Replacement, msg)
+      tag_list.append(unary_tag)
+      return MakeHtmlPlaceholderName(unary_tag, None, tag_list)
+  return re.sub('%{([^}]+)}|<(([a-zA-Z]+)[^>]*)(?<!/)>|</(([a-zA-Z]+)[^>]*)>|<(([a-zA-Z]+)[^>]*)/>', Replacement, msg)
 
 
 def GetPlaceholders(msg):
-  ph_names = re.findall('%{([^}]+)}|<(([a-zA-Z]+)[^>]*)>|</(([a-zA-Z]+)[^>]*)>|<(([a-zA-Z]+)[^>]*)/>', msg)
+  tag_list = []
+  ph_names = re.findall('%{([^}]+)}|<(([a-zA-Z]+)[^>]*)(?<!/)>|</(([a-zA-Z]+)[^>]*)>|<(([a-zA-Z]+)[^>]*)/>', msg)
   placeholders = []
   for (gettext_ph, open_tag_contents, open_tag, close_tag_contents, close_tag, unary_tag_contents, unary_tag) in ph_names:
     if gettext_ph != '':
       placeholders.append(tclib.Placeholder(gettext_ph.upper(), '%%{%s}' % gettext_ph, '(replaceable)'))
     elif open_tag != '':
-      placeholders.append(tclib.Placeholder(MakeHtmlPlaceholderName(open_tag, 'begin'), '<%s>' % open_tag_contents, '(HTML code)'))
+      tag_list.append(open_tag)
+      placeholders.append(tclib.Placeholder(MakeHtmlPlaceholderName(open_tag, 'begin', tag_list), '<%s>' % open_tag_contents, '(HTML code)'))
     elif close_tag != '':
-      placeholders.append(tclib.Placeholder(MakeHtmlPlaceholderName(close_tag, 'end'), '</%s>' % close_tag_contents, '(HTML code)'))
+      placeholders.append(tclib.Placeholder(MakeHtmlPlaceholderName(close_tag, 'end', tag_list), '</%s>' % close_tag_contents, '(HTML code)'))
     elif unary_tag != '':
-      placeholders.append(tclib.Placeholder(MakeHtmlPlaceholderName(unary_tag), '<%s/>' % unary_tag_contents, '(HTML code)'))
+      tag_list.append(unary_tag)
+      placeholders.append(tclib.Placeholder(MakeHtmlPlaceholderName(unary_tag, None, tag_list), '<%s/>' % unary_tag_contents, '(HTML code)'))
   return placeholders
 
 
